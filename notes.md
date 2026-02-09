@@ -18,3 +18,11 @@ Avoid ../ there unless you enjoy debugging spirits.
 ======
 
 tanstack query ,, fetching data in react
+
+======
+
+npm i @upstash/redis  // to connect redis db via rest principles  // io redis for tcp // upstash redis for rest
+
+redis , upstash ,(get key for handshake) >> env 
+
+after connection check in redis data browser , that if the room created in db or not , front > back > db 

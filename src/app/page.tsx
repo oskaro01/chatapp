@@ -4,6 +4,7 @@ import { useMutation } from "@tanstack/react-query";
 import { nanoid } from "nanoid";
 import { useEffect, useState } from "react";
 import { client } from "./lib/client";
+import { useRouter } from "next/navigation";
 
 
 const ANIMALS = ["cat", "dog", "owl", "crow"]
@@ -17,6 +18,7 @@ const generateUsername = () => {
 
 export default function Home() {
   const [username, setUsername] = useState("");
+  const router = useRouter()
 
   useEffect(() => {
     const main =() => {
@@ -35,11 +37,16 @@ export default function Home() {
     main()
   }, [])
 
+  // inside mutation we can send the user to the room,, how ? >> with a hook called useRouter from next/navigation, and then we can use the push method to navigate the user to the newly created room after we get the roomId from the response of the createRoom mutation.
   const { mutate: createRoom} = useMutation({  //mutate : createRoom , invokes the funtinon that we pass in the mutationFn property when we want to create a new chat room, and it will handle the asynchronous logic of making the API call to create the room and managing the loading and error states associated with that operation.
     mutationFn: async () => {
 
       const res = await client.room.create.post() // << this is how we make a POST request to the "/room" endpoint defined in our Elysia API server using the typed client we created. This will trigger the route handler for the "/room" endpoint, which in this case logs "room created" to the console. ,,, a fetch call to the backend to create a new chat room when the user clicks the "CREATE SECURE ROOM" button. The client.room.create.post() method sends a POST request to the "/room/create" endpoint defined in our Elysia API server, which will handle the request and perform the necessary actions to create a new chat room. The response from the server can be used to update the UI or navigate the user to the newly created chat room.
+
+      if (res.status === 200) {
+        router.push(`/room/${res.data?.roomId}`) // << This line uses the useRouter hook from Next.js to programmatically navigate the user to the newly created chat room. After successfully creating a room and receiving the roomId from the server response, this line constructs the URL for the chat room (e.g., "/room/abc123") and pushes it to the router, which updates the browser's URL and renders the corresponding page for that chat room.
       }
+    }
   })
 
   return (

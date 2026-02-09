@@ -1,7 +1,24 @@
+import { redis } from '@/app/lib/redis'
 import { Elysia, t } from 'elysia'
+import { nanoid } from 'nanoid'
+
+const ROOM_TTL_SECONDS = 60 * 10 
 
 const room = new Elysia({prefix: '/room'})
-    .post("/create", () => { console.log("room created") })  // << this is a router that listens to POST requests at the "/room" endpoint and logs "room created" to the console when a request is received.
+    .post("/create", async () => { 
+        const roomId = nanoid()  // every room has identification
+
+        // h for hash, hset redis dateset, like an object, we are creating a hash with the key meta:roomId, and we are setting the fields connected and createdAt, connected is an empty array that will hold the connected users, and createdAt is the timestamp of when the room was created.
+        // now lets connect to redis, to the room in db
+        await redis.hset(`meta:${roomId}`, {
+            connected: [], // this for? >> this will hold the connected users in the chat room, allowing us to manage and track who is currently in the room.
+            createdAt: Date.now(), 
+        })
+
+        await redis.expire(`meta:${roomId}`, ROOM_TTL_SECONDS)
+
+        return { roomId }
+    })  // << this is a router that listens to POST requests at the "/room" endpoint and logs "room created" to the console when a request is received.
 
 const app = new Elysia({ prefix: '/api' })
     .use(room) // << This line integrates the 'room' router into the main 'app' instance, allowing the application to handle requests defined in the 'room' router under the '/api/room' endpoint.   ,, or we connect the router to the main app with .use() method, so that the routes defined in the 'room' router will be accessible under the '/api/room' path in the main application.
