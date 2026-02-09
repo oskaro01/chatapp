@@ -1,6 +1,10 @@
 import { Elysia, t } from 'elysia'
 
+const room = new Elysia({prefix: '/room'})
+    .post("/create", () => { console.log("room created") })  // << this is a router that listens to POST requests at the "/room" endpoint and logs "room created" to the console when a request is received.
+
 const app = new Elysia({ prefix: '/api' })
+    .use(room) // << This line integrates the 'room' router into the main 'app' instance, allowing the application to handle requests defined in the 'room' router under the '/api/room' endpoint.   ,, or we connect the router to the main app with .use() method, so that the routes defined in the 'room' router will be accessible under the '/api/room' path in the main application.
     .get("/user", { user: { name: "John Doe" } }) // end point {return}
 
 

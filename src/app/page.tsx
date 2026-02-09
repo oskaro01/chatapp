@@ -1,7 +1,9 @@
 "use client"
 
+import { useMutation } from "@tanstack/react-query";
 import { nanoid } from "nanoid";
 import { useEffect, useState } from "react";
+import { client } from "./lib/client";
 
 
 const ANIMALS = ["cat", "dog", "owl", "crow"]
@@ -33,6 +35,13 @@ export default function Home() {
     main()
   }, [])
 
+  const { mutate: createRoom} = useMutation({  //mutate : createRoom , invokes the funtinon that we pass in the mutationFn property when we want to create a new chat room, and it will handle the asynchronous logic of making the API call to create the room and managing the loading and error states associated with that operation.
+    mutationFn: async () => {
+
+      const res = await client.room.create.post() // << this is how we make a POST request to the "/room" endpoint defined in our Elysia API server using the typed client we created. This will trigger the route handler for the "/room" endpoint, which in this case logs "room created" to the console. ,,, a fetch call to the backend to create a new chat room when the user clicks the "CREATE SECURE ROOM" button. The client.room.create.post() method sends a POST request to the "/room/create" endpoint defined in our Elysia API server, which will handle the request and perform the necessary actions to create a new chat room. The response from the server can be used to update the UI or navigate the user to the newly created chat room.
+      }
+  })
+
   return (
 
     <main className="flex min-h-screen flex-col items-center justify-center p-4">
@@ -57,9 +66,11 @@ export default function Home() {
 
               </div>
             </div>
-            <button className="w-full bg-zinc-100 text-black p-3 text-sm 
-            font-bold hover:bg-zinc-50 hover:text-black transition-colors mt-2 
-            cursor-pointer disabled:opacity-50">
+            <button 
+              onClick={() => createRoom()} // << This onClick handler is attached to the "CREATE SECURE ROOM" button. When the button is clicked, it triggers the createRoom function, which is defined using the useMutation hook from React Query. The createRoom function makes a POST request to the "/room/create" endpoint of our Elysia API server to create a new chat room. This allows users to easily create a secure chat room with a single click.
+              className="w-full bg-zinc-100 text-black p-3 text-sm 
+              font-bold hover:bg-zinc-50 hover:text-black transition-colors mt-2 
+              cursor-pointer disabled:opacity-50">
               CREATE SECURE ROOM
             </button>
           </div>
